@@ -1,0 +1,155 @@
+import kagglehub
+
+# Download latest version
+path = kagglehub.dataset_download("kyanyoga/sample-sales-data")
+
+print("Path to dataset files:", path)
+
+
+
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+
+
+
+df = pd.read_csv(
+    '/home/adwait/.cache/kagglehub/datasets/kyanyoga/sample-sales-data/versions/1/sales_data_sample.csv',
+    encoding='latin1'
+)
+
+print(df.head())
+print(df.shape)
+print(df.columns.tolist())
+
+
+
+
+# Remove duplicates and missing values
+df.drop_duplicates(inplace=True)
+
+# Group data customer-wise
+customer_data = df.groupby('CUSTOMERNAME').agg({
+    'SALES': 'sum',
+    'QUANTITYORDERED': 'sum',
+    'ORDERNUMBER': 'nunique',
+    'PRICEEACH': 'mean'
+}).reset_index()
+
+# Rename columns
+customer_data.columns = [
+    'Customer',
+    'Total_Sales',
+    'Total_Quantity',
+    'Order_Count',
+    'Average_Price'
+]
+
+# Select features
+X = customer_data.drop('Customer', axis=1)
+
+# Scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+print("Preprocessing completed!")
+print(customer_data.head())
+
+
+
+
+
+wcss = []
+
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, random_state=42, n_init=10)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+plt.plot(range(1, 11), wcss, marker='o')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS')
+plt.title('Elbow Method')
+plt.show()
+
+
+
+
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+
+customer_data['KMeans_Cluster'] = kmeans.fit_predict(X_scaled)
+
+print(customer_data[['Customer', 'KMeans_Cluster']].head())
+
+print("\nK-Means Cluster Counts:")
+print(customer_data['KMeans_Cluster'].value_counts())
+
+
+
+
+
+
+plt.scatter(
+    customer_data['Total_Sales'],
+    customer_data['Total_Quantity'],
+    c=customer_data['KMeans_Cluster'],
+    cmap='rainbow'
+)
+
+plt.xlabel('Total Sales')
+plt.ylabel('Total Quantity')
+plt.title('K-Means Clustering')
+plt.show()
+
+
+
+
+
+
+
+# Create linkage matrix
+linked = linkage(X_scaled, method='ward')
+
+# Plot dendrogram
+plt.figure(figsize=(12, 6))
+
+dendrogram(linked)
+
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Customers')
+plt.ylabel('Distance')
+plt.show()
+
+
+
+
+
+hc = AgglomerativeClustering(n_clusters=3, linkage='ward')
+
+customer_data['Hierarchical_Cluster'] = hc.fit_predict(X_scaled)
+
+print(customer_data[['Customer', 'Hierarchical_Cluster']].head())
+
+print("\nHierarchical Cluster Counts:")
+print(customer_data['Hierarchical_Cluster'].value_counts())
+
+
+
+
+
+print("K-Means Clustering:")
+print(customer_data['KMeans_Cluster'].value_counts())
+
+print("\nHierarchical Clustering:")
+print(customer_data['Hierarchical_Cluster'].value_counts())
+
+
+

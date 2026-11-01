@@ -1,0 +1,103 @@
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import StandardScaler
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+df = pd.read_csv('/home/adwait/.cache/kagglehub/datasets/balaka18/email-spam-classification-dataset-csv/versions/1/emails.csv')
+
+df.columns = df.columns.str.strip()
+
+print(df.head())
+print(df.shape)
+
+
+# Remove duplicates and missing values
+df.drop_duplicates(inplace=True)
+df.dropna(inplace=True)
+
+# Remove unnecessary Email No. column
+if 'Email No.' in df.columns:
+    df.drop('Email No.', axis=1, inplace=True)
+
+# Separate features and target
+X = df.drop('Prediction', axis=1)
+y = df['Prediction']
+
+# Convert to numeric
+X = X.apply(pd.to_numeric, errors='coerce')
+X = X.fillna(0)
+
+y = pd.to_numeric(y, errors='coerce')
+
+# Remove invalid target rows
+valid = y.notna()
+X = X.loc[valid]
+y = y.loc[valid].astype(int)
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Feature scaling
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+print("Preprocessing completed!")
+print("Training:", X_train.shape)
+print("Testing:", X_test.shape)
+
+
+
+
+knn = KNeighborsClassifier(n_neighbors=5)
+
+knn.fit(X_train, y_train)
+
+knn_pred = knn.predict(X_test)
+
+print("KNN Accuracy:", accuracy_score(y_test, knn_pred))
+
+
+svm = SVC(kernel='linear')
+
+svm.fit(X_train, y_train)
+
+svm_pred = svm.predict(X_test)
+
+print("SVM Accuracy:", accuracy_score(y_test, svm_pred))
+
+
+print("KNN Classification Report")
+print(classification_report(y_test, knn_pred))
+
+print("SVM Classification Report")
+print(classification_report(y_test, svm_pred))
+
+
+results = pd.DataFrame({
+    'Model': ['KNN', 'SVM'],
+    'Accuracy': [
+        accuracy_score(y_test, knn_pred),
+        accuracy_score(y_test, svm_pred)
+    ]
+})
+
+print(results)
+
+sns.barplot(data=results, x='Model', y='Accuracy')
+plt.title('KNN vs SVM Accuracy')
+plt.ylim(0, 1)
+plt.show()
+
+

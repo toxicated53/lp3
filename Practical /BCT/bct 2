@@ -1,0 +1,60 @@
+Practical-1: MetaMask Installation and Ether Spending Study
+Step 1: Install MetaMask
+For Desktop (Browser)
+
+    Open your preferred browser (Chrome, Firefox, Edge, or Brave).
+    Go to the official MetaMask website: https://metamask.io
+    Click "Download" and select your browser.
+    Add the extension to your browser.
+    Open MetaMask, and follow the setup:
+        Create a new wallet or import an existing one.
+        Set a strong password.
+        Backup your secret recovery phrase securely.
+
+For Mobile
+
+    Go to your App Store (iOS) or Google Play Store (Android).
+    Search for MetaMask.
+    Download and install the app.
+    Follow similar setup steps (create wallet, backup phrase).
+
+Step 2: Connect MetaMask to a Network
+
+    By default, MetaMask uses the Ethereum Mainnet.
+    To use test networks for learning, click the network dropdown and select a testnet like Goerli Test Network.
+    Obtain free test Ether from a Goerli faucet: https://goerlifaucet.com/.
+
+Step 3: Understanding Ether Spending per Transaction
+Key Concepts
+
+    Gas Limit: Maximum units of gas you are willing to spend.
+    Gas Price: Price per gas unit in Gwei (1 ETH = 1,000,000,000 Gwei).
+    Transaction Fee = Gas Limit × Gas Price
+
+Step 4: Make a Test Transaction
+
+    Ensure your wallet has ETH (test ETH on testnets).
+    Click Send in MetaMask.
+    Enter the recipient address and amount.
+    Adjust Gas Fee if desired.
+    Confirm the transaction.
+
+Step 5: Observe Spending
+
+    After sending, MetaMask displays the Transaction Fee in ETH.
+    To see detailed info, check Etherscan:
+        Copy the transaction hash from MetaMask.
+        Go to https://etherscan.io or testnet explorer like https://goerli.etherscan.io.
+        Paste the hash to see gas used and ETH spent.
+
+Step 6: Experiment
+
+    Send multiple transactions with different gas prices.
+    Observe how fees change based on network congestion.
+    Try interacting with smart contracts to see higher gas usage.
+
+Tips
+
+    Always use a testnet first to avoid losing real ETH.
+    MetaMask provides detailed transaction history and gas usage.
+
